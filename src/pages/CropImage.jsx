@@ -102,9 +102,20 @@ const CropImage = () => {
             console.error("No files to save.");
             return;
         }
-
+    
         setLoading(true);
-
+    
+        const downloadImage = (file, fileName) => {
+            const url = URL.createObjectURL(file);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+    
         for (const file of fileList) {
             for (const key of Object.keys(file)) {
                 if (key.startsWith('file') && key !== 'file') {
@@ -119,14 +130,16 @@ const CropImage = () => {
                     const blob = new Blob([byteArray], { type: 'image/png' });
                     const fileName = aspectRatioFile?.originFileObj?.name || 'image.png';
                     const file_upload = new File([blob], fileName, { type: 'image/png' });
-                    console.log(file_upload)
-                    // Handle file_upload here, e.g., uploading to a server
+                    
+                    // Trigger download for each file
+                    downloadImage(file_upload, fileName);
                 }
             }
         }
-
+    
         setLoading(false);
     };
+    
 
     const handlePreviewClick = (file, aspectRatio) => {
         setZoom(1);
@@ -207,7 +220,7 @@ const CropImage = () => {
                         />
                     </div>
                     <button onClick={handleSubmitImage} className="mt-4 py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700">
-                        Save Changes
+                        Download
                     </button>
                 </>
             )}
